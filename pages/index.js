@@ -9,10 +9,14 @@ export default function Home() {
     setLoading(true);
     setResults([]);
 
-    const lines = input.split('\n').map(line => line.trim()).filter(Boolean);
-    const newResults = [];
+    const cards = input
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0);
 
-    for (const card of lines) {
+    const tempResults = [];
+
+    for (const card of cards) {
       try {
         const res = await fetch('/api/check', {
           method: 'POST',
@@ -21,51 +25,59 @@ export default function Home() {
         });
 
         const json = await res.json();
-        newResults.push({ card, ...json });
+        tempResults.push({
+          card,
+          status: json?.status || 'Error',
+          message: json?.message || 'Tidak ada pesan'
+        });
       } catch (err) {
-        newResults.push({ card, status: 'Error', message: err.message });
+        tempResults.push({
+          card,
+          status: 'Error',
+          message: err.message
+        });
       }
 
-      // Update hasil secara real-time
-      setResults([...newResults]);
+      // update real-time
+      setResults([...tempResults]);
     }
 
     setLoading(false);
   };
 
   return (
-    <div style={{ padding: 20, fontFamily: 'sans-serif', maxWidth: 600, margin: '0 auto' }}>
-      <h1>Cek Kartu Massal</h1>
+    <div style={{ maxWidth: 600, margin: '0 auto', padding: 20, fontFamily: 'sans-serif' }}>
+      <h1>Cek Banyak Kartu</h1>
       <textarea
-        rows={10}
-        placeholder="Masukkan kartu satu per baris: 4242|12|2025|123"
         value={input}
         onChange={(e) => setInput(e.target.value)}
+        placeholder="Masukkan kartu satu per baris: 4242|12|2025|123"
+        rows={10}
         style={{ width: '100%', padding: 10, fontSize: 16 }}
       />
-      <button onClick={handleBulkCheck} disabled={loading} style={{ marginTop: 10, padding: 10 }}>
+      <button onClick={handleBulkCheck} disabled={loading} style={{ padding: 10, marginTop: 10 }}>
         {loading ? 'Memeriksa...' : 'Cek Semua'}
       </button>
 
       {results.length > 0 && (
         <div style={{ marginTop: 20 }}>
           <h3>Hasil:</h3>
-          <ul style={{ listStyle: 'none', padding: 0 }}>
+          <ul style={{ padding: 0, listStyle: 'none' }}>
             {results.map((r, i) => (
-              <li key={i} style={{ background: '#f5f5f5', padding: 10, marginBottom: 10 }}>
+              <li key={i} style={{ background: '#f0f0f0', padding: 10, marginBottom: 10 }}>
                 <strong>{r.card}</strong> →{' '}
                 <span style={{
-                  fontWeight: 'bold',
                   color:
                     r.status === 'Live' ? 'green' :
                     r.status === 'Die' ? 'red' :
                     r.status === 'Unknown' ? 'orange' :
-                    'black'
+                    'black',
+                  fontWeight: 'bold'
                 }}>
-                  {r.status || 'Error'}
+                  {r.status}
                 </span>
                 <br />
-                <small>{r.message || 'Tidak ada pesan'}</small>
+                <small>{r.message}</small>
               </li>
             ))}
           </ul>
