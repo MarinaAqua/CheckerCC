@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const apiRes = await fetch('https://https://api-cc.clubgratis.web.id/', {
+    const apiRes = await fetch('https://api-cc.clubgratis.web.id/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ data })
